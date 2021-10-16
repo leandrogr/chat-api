@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    entrypoint: ./.docker/entrypoint.sh
+    container_name: chat-api
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/home/node/app
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:10.6.4-focal
+    restart: always
+    command: --max_allowed_packet=32505856
+    environment:
+      MYSQL_ROOT_PASSWORD: master@123
+      MYSQL_DATABASE: chatdb
+      MYSQL_USER: devel
+      MYSQL_PASSWORD: devel@123
+    ports:
+      - 3306:3306
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+volumes:
+  mariadb-data:
