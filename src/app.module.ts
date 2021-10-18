@@ -4,6 +4,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AppGateway } from './app.gateway';
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AppGateway } from './app.gateway';
     } as TypeOrmModuleOptions),
     UsersModule,
     AuthModule,
+    RoomsModule,
   ],
   controllers: [],
   providers: [AppGateway],
