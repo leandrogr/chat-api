@@ -27,5 +27,4 @@ export class RoomsController {
   async show(@Param('id', new ParseUUIDPipe()) id: string) {
     return await this.roomsService.findOrFail({ id });
   }
-
 }
