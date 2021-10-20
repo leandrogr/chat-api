@@ -1,9 +1,5 @@
 import { Logger } from '@nestjs/common';
 import {
-  ConnectedSocket,
-  MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
@@ -12,25 +8,29 @@ import {
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({ cors: true })
-export class AppGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class AppGateway implements OnGatewayInit {
   @WebSocketServer() server: Server;
+
   private logger: Logger = new Logger('AppGateway');
 
   @SubscribeMessage('msgToServer')
-  handleMessage(client: Socket, payload: string): void {
-    this.server.emit('msgToClient', payload, client.id);
+  handleMessage(client: Socket, payload: any) {
+    this.server.to(payload.room).emit('msgToClient', payload, client.id);
   }
 
-  // @SubscribeMessage('createRoom')
-  // createRoom(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
-  //   client.join(data, err => {
-  //     if (err) {
-  //       this.logger.error(err);
-  //     }
-  //   });
-  // }
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(client: Socket, room: string) {
+    client.join(room);
+    client.emit('joinedRoom', room);
+    this.logger.log(`Client ${client.id} join room ${room}`);
+  }
+
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(client: Socket, room: string) {
+    client.leave(room);
+    client.emit('leftRoom', room);
+    this.logger.log(`Client ${client.id} leave room ${room}`);
+  }
 
   afterInit(server: Server) {
     this.logger.log('Server websocket init...');
